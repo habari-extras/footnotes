@@ -72,7 +72,7 @@ class Footnotes extends Plugin
 		$this->footnotes[$i] = $footnote;
 		$id = $this->current_id . '-' . $i;
 
-		return '<sup id="footnote-link-' . $id . '"><a href="#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
+		return '<sup class="footnote-link" id="footnote-link-' . $id . '"><a href="#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
 	}
 
 	public function action_update_check ( ) {
