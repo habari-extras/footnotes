@@ -37,6 +37,13 @@ class Footnotes extends Plugin
 
 	public function filter_post_content( $content, $post )
 	{
+		// If we're on the publish page, replacement will be destructive.
+		// We don't want that, so return here.
+		$controller = Controller::get_handler();
+		if ( $controller->action == 'admin' && $controller->handler_vars['page'] == 'publish' ) {
+			return $content;
+		}
+
 		// If there are no footnotes, save the trouble and just return it as is.
 		if ( strpos( $content, '<footnote>' ) === false ) {
 			return $content;
