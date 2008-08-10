@@ -59,11 +59,6 @@ class Footnotes extends Plugin
 	  }
 	}
 	
-	function action_add_template_vars( $theme )
-	{
-		if(is_array($this->footnotes)) $theme->footnotes = $this->footnotes;
-	}
-	
 	public function filter_post_content( $content, $post )
 	{
 
@@ -81,13 +76,15 @@ class Footnotes extends Plugin
 
 		$this->footnotes = array();
 		$this->current_id = $post->id;
-
+		
 		$return = preg_replace( '/(<footnote>)(.*)(<\/footnote>)/Use', '$this->add_footnote(\'\2\')', $content );
 		$return = preg_replace( '/<cite url="(.*)">(.*)<\/cite>/Use', '$this->add_citation(\'\1\', \'\2\')', $return );
 
 		if ( count( $this->footnotes ) == 0 ) {
 			return $content;
 		}
+		
+		$post->footnotes= $this->footnotes;
 
 		$append = '<ol class="footnotes">' . "\n";
 				
