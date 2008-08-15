@@ -79,7 +79,7 @@ class Footnotes extends Plugin
 		$this->footnotes = array();
 		$this->current_id = $post->id;
 
-		$return = preg_replace( '/(<footnote>)(.*)(<\/footnote>)/Use', '$this->add_footnote(\'\2\')', $content );
+		$return = preg_replace_callback( '/<footnote>(.*)<\/footnote>/Us', array('self', 'add_footnote'), $content );
 		$return = preg_replace( '/<cite url="(.*)">(.*)<\/cite>/Use', '$this->add_citation(\'\1\', \'\2\')', $return );
 
 		if ( count( $this->footnotes ) == 0 ) {
@@ -102,7 +102,8 @@ class Footnotes extends Plugin
 					$append .= ' on <a href="http://flickr.com">Flickr</a>';
 					$append .= ' <a href="#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
 					$append .= "</li>\n";
-				} else {
+				}
+				else {
 					$append .= '<li id="footnote-' . $this->current_id . '-' . $i . '">';
 					$append .=  $footnote;
 					$append .= ' <a href="#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
@@ -130,7 +131,8 @@ class Footnotes extends Plugin
 
 			if ( Cache::has('footcite__' . $photo) ) {
 				$fetch = Cache::get('footcite__' . $photo);
-			} else {
+			}
+			else {
 				$fetch = RemoteRequest::get_contents('http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key='.self::FLICKR_KEY.'&photo_id='.$photo);
 				Cache::set('footcite__' . $photo, $fetch);
 			}
@@ -163,8 +165,9 @@ class Footnotes extends Plugin
 		return '<sup class="footnote-link" id="footnote-link-' . $id . '"><a href="#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
 	}
 
-	private function add_footnote( $footnote )
+	private function add_footnote( $matches )
 	{
+		$footnote = $matches[1];
 		$i = count( $this->footnotes ) + 1;
 
 		$this->footnotes[$i] = $footnote;
