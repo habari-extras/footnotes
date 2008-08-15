@@ -18,7 +18,7 @@
 
 class Footnotes extends Plugin
 {
-	const VERSION = '2.1';
+	const VERSION = '2.2';
 	private $footnotes;
 	private $current_id;
 
@@ -32,7 +32,7 @@ class Footnotes extends Plugin
 			'author' => 'Habari Community',
 			'authorurl' => 'http://habariproject.org',
 			'version' => self::VERSION,
-			'description' => 'Use footnotes in your posts. Syntax: &lt;footnote&gt;Your footnote&lt;/footnote&gt;, wherever you want the reference point to be. Everything is done automatically. You can also cite a source by doing &lt;cite url="http://foo.bar/foo/"&gt;Title&lt;/cite&gt;.',
+			'description' => 'Use footnotes in your posts. Syntax: &lt;footnote&gt;Your footnote&lt;/footnote&gt;, wherever you want the reference point to be. Everything is done automatically. You can also cite a source using a url attribute like this &lt;footnote url="http://foo.bar/foo/"&gt;Title&lt;/footnote&gt;.',
 			'license' => 'Apache License 2.0'
 		);
 	}
@@ -51,7 +51,6 @@ class Footnotes extends Plugin
 			switch ( $action ) {
 			case _t('Configure') :
 				$form = new FormUI( strtolower( get_class( $this ) ) );
-				// TODO Add a note as to why you might want to suppress the list
 				$form->append( 'static', 'why_suppress', _t('<small>If you suppress the list, you can add them manually using the $post->footnotes array.</small>') );
 				$form->append( 'checkbox', 'suppress_list', 'footnotes__suppress_list', _t('Don\'t append the footnote list to posts') );
 				$form->append( 'submit', 'save', _t('Save') );
@@ -72,15 +71,14 @@ class Footnotes extends Plugin
 		}
 
 		// If there are no footnotes, save the trouble and just return it as is.
-		if ( strpos( $content, '<footnote>' ) === false && strpos( $content, '<cite' ) === false ) {
+		if ( strpos( $content, '<footnote' ) === false ) {
 			return $content;
 		}
 
 		$this->footnotes = array();
 		$this->current_id = $post->id;
 
-		$return = preg_replace_callback( '/<footnote>(.*)<\/footnote>/Us', array('self', 'add_footnote'), $content );
-		$return = preg_replace( '/<cite url="(.*)">(.*)<\/cite>/Use', '$this->add_citation(\'\1\', \'\2\')', $return );
+		$return = preg_replace_callback( '/<footnote(\s+url=[\'"].*[\'"])?>(.*)<\/footnote>/Us', array('self', 'add_footnote'), $content );
 
 		if ( count( $this->footnotes ) == 0 ) {
 			return $content;
@@ -88,86 +86,99 @@ class Footnotes extends Plugin
 
 		$post->footnotes= $this->footnotes;
 
-		$append = '<ol class="footnotes">' . "\n";
+		if ( !Options::get('footnotes__suppress_list') ) {
 
-		if ( Options::get('footnotes__suppress_list') != 1 ) {
+			$append = '<ol class="footnotes">' . "\n";
 
 			foreach ( $this->footnotes as $i => $footnote ) {
+				// if there was a url
 				if ( is_array($footnote) ) {
-					// Utils::debug($footnote);
 
-					$append .= '<li id="footnote-' . $this->current_id . '-' . $i . '" class="cite '. $footnote['type'] . '">';
-					$append .= '<a href="' . $footnote['photo']['url'] . '" title="' . $footnote['photo']['title'] . '">Photo</a>';
-					$append .= ' by <a href="' . $footnote['owner']['url'] . '" title="' . $footnote['owner']['name'] . '">' . $footnote['owner']['username'] . '</a>';
-					$append .= ' on <a href="http://flickr.com">Flickr</a>';
-					$append .= ' <a href="#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
-					$append .= "</li>\n";
+					switch ( $footnote['type'] ) {
+					case "flickr":
+						$append .= '<li id="footnote-' . $this->current_id . '-' . $i . '" class="cite '. $footnote['type'] . '">';
+						$append .= '<a href="' . $footnote['photo']['url'] . '" title="' . $footnote['photo']['title'] . '">Photo</a>';
+						$append .= ' by <a href="' . $footnote['owner']['url'] . '" title="' . $footnote['owner']['name'] . '">' . $footnote['owner']['username'] . '</a>';
+						$append .= ' on <a href="http://flickr.com">Flickr</a>';
+						$append .= ' <a href="#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
+						$append .= "</li>\n";
+						break;
+
+					case "vanilla":
+						$append .= '<li id="footnote-' . $this->current_id . '-' . $i . '">';
+						$append .= '<a href="' . $footnote['url'] . '" title="' . $footnote['text'] . '">' . $footnote['text'] . '</a>';
+						$append .= ' <a href="#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
+						$append .= "</li>\n";
+						break;
+
+					}
+
 				}
 				else {
+
 					$append .= '<li id="footnote-' . $this->current_id . '-' . $i . '">';
 					$append .=  $footnote;
 					$append .= ' <a href="#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
 					$append .= "</li>\n";
 				}
 			}
-		}
 
-		$append .= "</ol>\n";
+			$append .= "</ol>\n";
+
+		}
 
 		return $return . $append;
 	}
 
-	private function add_citation( $url, $title )
+	private function add_footnote( $matches )
 	{
-		$regex = '/http:\/\/(.*)\/photos\/(\w*)\/(\d*)/';
-
-		$matches = array();
-
-		preg_match($regex, $url, $matches);
-
-		if ( $matches[1] == 'flickr.com' ) {
-			$user = $matches[2];
-			$photo = $matches[3];
-
-			if ( Cache::has('footcite__' . $photo) ) {
-				$fetch = Cache::get('footcite__' . $photo);
-			}
-			else {
-				$fetch = RemoteRequest::get_contents('http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key='.self::FLICKR_KEY.'&photo_id='.$photo);
-				Cache::set('footcite__' . $photo, $fetch);
-			}
-
-			$xml = new SimpleXMLElement($fetch);
+		$url = $matches[1];
+		$footnote = $matches[2];
+		if ( $url != '' ) {
+			$url = preg_replace('/\s+url=[\'"](.*)[\'"]/', '$1', $url);
+			$url_parts = array();
 
 			$info = array();
 
-			$info['type'] = 'flickr';
-			$info['photo'] = array(
-				'title' => (string) $xml->photo->title,
-				'id' => $photo,
-				'url' => (string) $xml->photo->urls->url[0]
-			);
+			// It's a link to a flickr photo
+			if ( preg_match('/http:\/\/flickr.com\/photos\/(\w*)\/(\d*)/', $url, $url_parts) ) {
+				$user = $url_parts[1];
+				$photo = $url_parts[2];
 
-			$info['owner'] = array(
-				'username' => (string) $xml->photo->owner['username'],
-				'name' => (string) $xml->photo->owner['realname'],
-				'id' => (string) $xml->photo->owner['nsid'],
-				'url' => 'http://www.flickr.com/photos/' . $user . '/'
-			);
+				if ( Cache::has('footcite__' . $photo) ) {
+					$fetch = Cache::get('footcite__' . $photo);
+				}
+				else {
+					$fetch = RemoteRequest::get_contents('http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key='.self::FLICKR_KEY.'&photo_id='.$photo);
+					Cache::set('footcite__' . $photo, $fetch);
+				}
 
+				$xml = new SimpleXMLElement($fetch);
+
+				$info['type'] = 'flickr';
+				$info['photo'] = array(
+					'title' => (string) $xml->photo->title,
+					'id' => $photo,
+					'url' => (string) $xml->photo->urls->url[0]
+				);
+
+				$info['owner'] = array(
+					'username' => (string) $xml->photo->owner['username'],
+					'name' => (string) $xml->photo->owner['realname'],
+					'id' => (string) $xml->photo->owner['nsid'],
+					'url' => 'http://www.flickr.com/photos/' . $user . '/'
+				);
+
+			}
+			else {
+				$info['type'] = 'vanilla';
+				$info['url'] = $url;
+				$info['text'] = $footnote;
+			}
+
+			$footnote = $info;
 		}
 
-		$i = count( $this->footnotes ) + 1;
-
-		$this->footnotes[$i] = $info;
-		$id = $this->current_id . '-' . $i;
-
-		return '<sup class="footnote-link" id="footnote-link-' . $id . '"><a href="#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
-	}
-
-	private function add_footnote( $matches )
-	{
-		$footnote = $matches[1];
 		$i = count( $this->footnotes ) + 1;
 
 		$this->footnotes[$i] = $footnote;
