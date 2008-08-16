@@ -85,10 +85,12 @@ class Footnotes extends Plugin
 		}
 
 		$post->footnotes= $this->footnotes;
-
+		
+		$append = '';
+		
 		if ( !Options::get('footnotes__suppress_list') ) {
 
-			$append = '<ol class="footnotes">' . "\n";
+			$append.= '<ol class="footnotes">' . "\n";
 
 			foreach ( $this->footnotes as $i => $footnote ) {
 				// if there was a url
