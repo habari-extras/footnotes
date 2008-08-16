@@ -21,6 +21,7 @@ class Footnotes extends Plugin
 	const VERSION = '2.2';
 	private $footnotes;
 	private $current_id;
+	private $post;
 
 	const FLICKR_KEY= '22595035de2c10ab4903b2c2633a2ba4';
 
@@ -77,7 +78,8 @@ class Footnotes extends Plugin
 
 		$this->footnotes = array();
 		$this->current_id = $post->id;
-
+		
+		$this->post= $post;
 		$return = preg_replace_callback( '/<footnote(\s+url=[\'"].*[\'"])?>(.*)<\/footnote>/Us', array('self', 'add_footnote'), $content );
 
 		if ( count( $this->footnotes ) == 0 ) {
@@ -120,7 +122,7 @@ class Footnotes extends Plugin
 
 					$append .= '<li id="footnote-' . $this->current_id . '-' . $i . '">';
 					$append .=  $footnote;
-					$append .= ' <a href="#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
+					$append .= ' <a href=" ' . URL::get('display_entry', array('slug' => $this->post->slug)) . '#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
 					$append .= "</li>\n";
 				}
 			}
@@ -186,7 +188,7 @@ class Footnotes extends Plugin
 		$this->footnotes[$i] = $footnote;
 		$id = $this->current_id . '-' . $i;
 
-		return '<sup class="footnote-link" id="footnote-link-' . $id . '"><a href="#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
+		return '<sup class="footnote-link" id="footnote-link-' . $id . '"><a href="' . URL::get('display_entry', array('slug' => $this->post->slug)) . '#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
 	}
 
 	public function action_update_check () {
