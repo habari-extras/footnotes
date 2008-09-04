@@ -18,7 +18,7 @@
 
 class Footnotes extends Plugin
 {
-	const VERSION = '2.2';
+	const VERSION = '2.3';
 	private $footnotes;
 	private $current_id;
 	private $post;
@@ -33,7 +33,7 @@ class Footnotes extends Plugin
 			'author' => 'Habari Community',
 			'authorurl' => 'http://habariproject.org',
 			'version' => self::VERSION,
-			'description' => 'Use footnotes in your posts. Syntax: &lt;footnote&gt;Your footnote&lt;/footnote&gt;, wherever you want the reference point to be. Everything is done automatically. You can also cite a source using a url attribute like this &lt;footnote url="http://foo.bar/foo/"&gt;Title&lt;/footnote&gt;.',
+			'description' => 'Use footnotes in your posts. Syntax: &lt;footnote&gt;Your footnote&lt;/footnote&gt;, wherever you want the reference point to be. Everything is done automatically. You can also cite a source using a url attribute like this &lt;footnote url="http://foo.bar/foo/"&gt;Title&lt;/footnote&gt;. Also now supports ((WP-Footnotes syntax, for compatibility.)).',
 			'license' => 'Apache License 2.0'
 		);
 	}
@@ -72,7 +72,7 @@ class Footnotes extends Plugin
 		}
 
 		// If there are no footnotes, save the trouble and just return it as is.
-		if ( strpos( $content, '<footnote' ) === false ) {
+		if ( strpos( $content, '<footnote' ) === false && strpos( $content, ' ((' ) === false ) {
 			return $content;
 		}
 
@@ -80,8 +80,8 @@ class Footnotes extends Plugin
 		$this->current_id = $post->id;
 		
 		$this->post= $post;
-		$return = preg_replace_callback( '/<footnote(\s+url=[\'"].*[\'"])?>(.*)<\/footnote>/Us', array('self', 'add_footnote'), $content );
-
+		$return = preg_replace_callback( '/(?:<footnote(\s+url=[\'"].*[\'"])?>|\s\(\()(.*)(?:\)\)|<\/footnote>)/Us', array('self', 'add_footnote'), $content );
+		
 		if ( count( $this->footnotes ) == 0 ) {
 			return $content;
 		}
