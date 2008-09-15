@@ -18,7 +18,7 @@
 
 class Footnotes extends Plugin
 {
-	const VERSION = '2.3';
+	const VERSION = '2.4';
 	private $footnotes;
 	private $current_id;
 	private $post;
@@ -78,18 +78,18 @@ class Footnotes extends Plugin
 
 		$this->footnotes = array();
 		$this->current_id = $post->id;
-		
+
 		$this->post= $post;
-		$return = preg_replace_callback( '/(?:<footnote(\s+url=[\'"].*[\'"])?>|\s\(\()(.*)(?:\)\)|<\/footnote>)/Us', array('self', 'add_footnote'), $content );
-		
+		$return = preg_replace_callback( '/(?:<footnote(\s+url=[\'"].*[\'"])?>|\s\(\()(.*)(?:\)\)|<\/footnote>)/Us', array($this, 'add_footnote'), $content );
+
 		if ( count( $this->footnotes ) == 0 ) {
 			return $content;
 		}
 
 		$post->footnotes= $this->footnotes;
-		
+
 		$append = '';
-		
+
 		if ( !Options::get('footnotes__suppress_list') ) {
 
 			$append.= '<ol class="footnotes">' . "\n";
