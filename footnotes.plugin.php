@@ -23,7 +23,7 @@ class Footnotes extends Plugin
 	private $current_id;
 	private $post;
 
-	const FLICKR_KEY= '22595035de2c10ab4903b2c2633a2ba4';
+	const FLICKR_KEY = '22595035de2c10ab4903b2c2633a2ba4';
 
 	public function info()
 	{
@@ -79,14 +79,14 @@ class Footnotes extends Plugin
 		$this->footnotes = array();
 		$this->current_id = $post->id;
 
-		$this->post= $post;
+		$this->post = $post;
 		$return = preg_replace_callback( '/(?:<footnote(\s+url=[\'"].*[\'"])?>|\s\(\()(.*)(?:\)\)|<\/footnote>)/Us', array($this, 'add_footnote'), $content );
 
 		if ( count( $this->footnotes ) == 0 ) {
 			return $content;
 		}
 
-		$post->footnotes= $this->footnotes;
+		$post->footnotes = $this->footnotes;
 
 		$append = '';
 
