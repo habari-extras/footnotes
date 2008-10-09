@@ -67,7 +67,7 @@ class Footnotes extends Plugin
 		// If we're on the publish page, replacement will be destructive.
 		// We don't want that, so return here.
 		$controller = Controller::get_handler();
-		if ( $controller->action == 'admin' && isset($controller->handler_vars['page']) && $controller->handler_vars['page'] == 'publish' ) {
+		if ( isset( $controller->action ) && $controller->action == 'admin' && isset($controller->handler_vars['page']) && $controller->handler_vars['page'] == 'publish' ) {
 			return $content;
 		}
 
