@@ -61,6 +61,11 @@ class Footnotes extends Plugin
 		}
 	}
 
+	public function filter_post_title($title, $post) {
+		$this->filter_post_content($post->content, $post);
+		return $title;
+	}
+
 	public function filter_post_content( $content, $post )
 	{
 
@@ -81,6 +86,8 @@ class Footnotes extends Plugin
 
 		$this->post = $post;
 		$return = preg_replace_callback( '/(?:<footnote(\s+url=[\'"].*[\'"])?>|\s\(\()(.*)(?:\)\)|<\/footnote>)/Us', array($this, 'add_footnote'), $content );
+
+		$post->footnotes = $this->footnotes;
 
 		if ( count( $this->footnotes ) == 0 ) {
 			return $content;
