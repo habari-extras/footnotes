@@ -129,7 +129,7 @@ class Footnotes extends Plugin
 
 					$append .= '<li id="footnote-' . $this->current_id . '-' . $i . '">';
 					$append .=  $footnote;
-					$append .= ' <a href=" ' . URL::get('display_entry', array('slug' => $this->post->slug)) . '#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
+					$append .= ' <a href=" ' . $this->post->permalink . '#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
 					$append .= "</li>\n";
 				}
 			}
@@ -195,7 +195,7 @@ class Footnotes extends Plugin
 		$this->footnotes[$i] = $footnote;
 		$id = $this->current_id . '-' . $i;
 
-		return '<sup class="footnote-link" id="footnote-link-' . $id . '"><a href="' . URL::get('display_entry', array('slug' => $this->post->slug)) . '#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
+		return '<sup class="footnote-link" id="footnote-link-' . $id . '"><a href="' . $this->post->permalink . '#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
 	}
 
 	public function action_update_check () {
