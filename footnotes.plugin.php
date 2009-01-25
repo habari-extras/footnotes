@@ -150,20 +150,26 @@ class Footnotes extends Plugin
 			$url_parts = array();
 
 			$info = array();
-
+						
 			// It's a link to a flickr photo
-			if ( preg_match('/http:\/\/flickr.com\/photos\/(\w*)\/(\d*)/', $url, $url_parts) ) {
+			if ( preg_match('/http:\/\/(www\.)?flickr.com\/photos\/(.*)\/(.*)/', $url, $url_parts)) {
 				$user = $url_parts[1];
 				$photo = $url_parts[2];
+								
+				if(count($url_parts) > 3) {
+					// Matched longer version
+					$user = $url_parts[2];
+					$photo = $url_parts[3];
+				}
 
-				if ( Cache::has('footcite__' . $photo) ) {
+				if ( Cache::has('footcite__' . $photo)) {
 					$fetch = Cache::get('footcite__' . $photo);
 				}
 				else {
 					$fetch = RemoteRequest::get_contents('http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key='.self::FLICKR_KEY.'&photo_id='.$photo);
 					Cache::set('footcite__' . $photo, $fetch);
 				}
-
+				
 				$xml = new SimpleXMLElement($fetch);
 
 				$info['type'] = 'flickr';
