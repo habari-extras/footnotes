@@ -1,0 +1,9 @@
+<plugin>
+	<name>Footnotes</name>
+	<url>http://habariproject.org</url>
+	<author>Habari Community</author>
+	<authorurl>http://habariproject.org</authorurl>
+	<description>Use footnotes in your posts. Syntax: &lt;footnote&gt;Your footnote&lt;/footnote&gt;, wherever you want the reference point to be. Everything is done automatically. You can also cite a source using a url attribute like this &lt;footnote url="http://foo.bar/foo/"&gt;Title&lt;/footnote&gt;. Also now supports ((WP-Footnotes syntax, for compatibility.)).</description>
+	<license>Apache License 2.0</license>
+</plugin>
+
