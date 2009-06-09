@@ -25,19 +25,6 @@ class Footnotes extends Plugin
 
 	const FLICKR_KEY = '22595035de2c10ab4903b2c2633a2ba4';
 
-	public function info()
-	{
-		return array(
-			'name' => 'Footnotes',
-			'url' => 'http://habariproject.org',
-			'author' => 'Habari Community',
-			'authorurl' => 'http://habariproject.org',
-			'version' => self::VERSION,
-			'description' => 'Use footnotes in your posts. Syntax: &lt;footnote&gt;Your footnote&lt;/footnote&gt;, wherever you want the reference point to be. Everything is done automatically. You can also cite a source using a url attribute like this &lt;footnote url="http://foo.bar/foo/"&gt;Title&lt;/footnote&gt;. Also now supports ((WP-Footnotes syntax, for compatibility.)).',
-			'license' => 'Apache License 2.0'
-		);
-	}
-
 	public function filter_plugin_config( $actions, $plugin_id )
 	{
 		if ( $plugin_id == $this->plugin_id() ) {
