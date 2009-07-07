@@ -116,7 +116,7 @@ class Footnotes extends Plugin
 
 					$append .= '<li id="footnote-' . $this->current_id . '-' . $i . '">';
 					$append .=  $footnote;
-					$append .= ' <a href=" ' . $this->post->permalink . '#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
+					$append .= ' <a href="' . $this->post->permalink . '#footnote-link-' . $this->current_id . '-' . $i . '">&#8617;</a>';
 					$append .= "</li>\n";
 				}
 			}
