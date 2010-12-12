@@ -48,12 +48,12 @@ class Footnotes extends Plugin
 		}
 	}
 
-	public function filter_post_title($title, $post) {
-		$this->filter_post_content($post->content, $post);
+	public function filter_post_title_out($title, $post) {
+		$this->filter_post_content_out($post->content, $post);
 		return $title;
 	}
 
-	public function filter_post_content( $content, $post )
+	public function filter_post_content_out( $content, $post )
 	{
 
 		// If we're on the publish page, replacement will be destructive.
