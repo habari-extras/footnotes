@@ -18,7 +18,6 @@
 
 class Footnotes extends Plugin
 {
-	const VERSION = '2.5';
 	private $footnotes;
 	private $current_id;
 	private $post;
