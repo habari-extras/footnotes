@@ -18,34 +18,20 @@
 
 class Footnotes extends Plugin
 {
-	const VERSION = '2.4';
+	const VERSION = '2.5';
 	private $footnotes;
 	private $current_id;
 	private $post;
 
 	const FLICKR_KEY = '22595035de2c10ab4903b2c2633a2ba4';
 
-	public function filter_plugin_config( $actions, $plugin_id )
+	public function configure()
 	{
-		if ( $plugin_id == $this->plugin_id() ) {
-			$actions[] = _t('Configure');
-		}
-		return $actions;
-	}
-
-	public function action_plugin_ui( $plugin_id, $action )
-	{
-		if ( $plugin_id == $this->plugin_id() ) {
-			switch ( $action ) {
-			case _t('Configure') :
-				$form = new FormUI( strtolower( get_class( $this ) ) );
-				$form->append( 'static', 'why_suppress', _t('<small>If you suppress the list, you can add them manually using the $post->footnotes array.</small>') );
-				$form->append( 'checkbox', 'suppress_list', 'footnotes__suppress_list', _t('Don\'t append the footnote list to posts') );
-				$form->append( 'submit', 'save', _t('Save') );
-				$form->out();
-				break;
-			}
-		}
+		$form = new FormUI( strtolower( get_class( $this ) ) );
+		$form->append( 'static', 'why_suppress', _t('<small>If you suppress the list, you can add them manually using the $post->footnotes array.</small>') );
+		$form->append( 'checkbox', 'suppress_list', 'footnotes__suppress_list', _t('Don\'t append the footnote list to posts') );
+		$form->append( 'submit', 'save', _t('Save') );
+		return $form;
 	}
 
 	public function filter_post_title_out($title, $post) {
@@ -189,10 +175,6 @@ class Footnotes extends Plugin
 		$id = $this->current_id . '-' . $i;
 
 		return '<sup class="footnote-link" id="footnote-link-' . $id . '"><a href="' . $this->post->permalink . '#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
-	}
-
-	public function action_update_check () {
-		Update::add( 'Footnotes', '021e0510-a3cc-4a9b-9faa-193596f04dcb', self::VERSION );
 	}
 
 }
