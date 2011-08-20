@@ -2,12 +2,17 @@
 <pluggable type="plugin">
 	<name>Footnotes</name>
 	<license url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License 2.0</license>
-	<author url="http://habariproject.org/">Habari Community</author>
+	<author url="http://habariproject.org/">The Habari Community</author>
 	<author url="http://robinadr.com/">Robin Adrianse (a.k.a. rob1n)</author>
 	<version>2.5</version>
 	<url>http://habariproject.org/</url>
 	<guid>021e0510-a3cc-4a9b-9faa-193596f04dcb</guid>
-	<description><![CDATA[Use footnotes in your posts. Syntax: &lt;footnote&gt;Your footnote&lt;/footnote&gt;, wherever you want the reference point to be. Everything is done automatically. You can also cite a source using a url attribute like this &lt;footnote url="http://foo.bar/foo/"&gt;Title&lt;/footnote&gt;. Also now supports ((WP-Footnotes syntax, for compatibility.)).]]></description>
+	<description><![CDATA[Use footnotes in your posts.]]></description>
 	<copyright>2009</copyright>
+	<help>
+		<value>
+			<![CDATA[Usage syntax: <code>&lt;footnote&gt;Your footnote&lt;/footnote&gt;</code>, wherever you want the reference point to be. Everything is done automatically. You can also cite a source using a url attribute like this <code>&lt;footnote url="http://foo.bar/foo/"&gt;Title&lt;/footnote&gt;</code>. Also now supports WP-Footnotes syntax, for compatibility.]]>
+		</value>
+	</help>
 </pluggable>
  
