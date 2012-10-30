@@ -175,7 +175,11 @@ class Footnotes extends Plugin
 
 		return '<sup class="footnote-link" id="footnote-link-' . $id . '"><a href="' . $this->post->permalink . '#footnote-' . $id . '" rel="footnote">' . $i . '</a></sup>';
 	}
-
+	
+	public function filter_post_content_atom( $content, $post )
+	{
+		return $this->filter_post_content_out( $content, $post );
+	}
 }
 
 ?>
