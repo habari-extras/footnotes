@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+	namespace Habari;
+
 class Footnotes extends Plugin
 {
 	private $footnotes;
